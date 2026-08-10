@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>دفتر روزانه معاملات</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>دفتر روزانه معاملات</h1>
+
+
+<div class="card">
+
+
+<h3>ثبت کننده</h3>
+
+<div class="users">
+
+<button class="user active">وحید</button>
+
+<button class="user">امیر</button>
+
+</div>
+
+
+
+<h3>نوع عملیات</h3>
+
+<div class="operations">
+
+<button class="operation">خرید</button>
+
+<button class="operation">فروش</button>
+
+<button class="operation">دریافت</button>
+
+<button class="operation">پرداخت</button>
+
+<button class="operation">انتقال</button>
+
+</div>
+
+
+
+<label>
+شرح عملیات
+</label>
+
+<textarea id="description"
+placeholder="مثال: فروش به خانم دهقان"></textarea>
+
+
+
+<label>
+مبلغ
+</label>
+
+<input 
+id="amount"
+type="number"
+placeholder="مثال: 400000000">
+
+
+<label>
+وزن
+</label>
+
+<input 
+id="weight"
+type="number"
+step="0.001"
+placeholder="وزن به گرم، مثال: 12.350">
+
+
+<label>
+مظنه (اختیاری)
+</label>
+
+<input 
+id="price"
+type="number"
+placeholder="مثال: 32500000">
+
+
+
+<label>
+عکس رسید یا فیش
+</label>
+
+<input 
+id="image"
+type="file"
+accept="image/*">
+
+
+
+<button class="save">
+
+ثبت عملیات
+
+</button>
+
+
+
+</div>
+
+
+<div class="card">
+
+<h3>
+آخرین ثبت ها
+</h3>
+
+
+<div id="list">
+
+هنوز اطلاعاتی ثبت نشده
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script src="app.js?v=2.0.2"></script>
+
+
+</body>
+
+</html>
