@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>دفتر روزانه - حسابدار</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#111;
+    color:#fff;
+    font-family:Tahoma,Arial,sans-serif;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.header{
+    background:#1d1d1d;
+    border:1px solid #333;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.header h1{
+    margin:0 0 8px;
+    color:#d4af37;
+}
+
+.header p{
+    margin:0;
+    color:#aaa;
+}
+
+
+/* آمار */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.stat{
+    background:#1d1d1d;
+    border:1px solid #333;
+    border-radius:14px;
+    padding:15px;
+    text-align:center;
+}
+
+.stat-number{
+    display:block;
+    font-size:22px;
+    font-weight:bold;
+    color:#d4af37;
+    margin-bottom:7px;
+}
+
+.stat-title{
+    color:#aaa;
+    font-size:13px;
+}
+
+
+/* ثبت‌ها */
+
+.trade{
+    background:#1d1d1d;
+    border:1px solid #333;
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:14px;
+}
+
+.trade-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    padding-bottom:10px;
+    border-bottom:1px solid #333;
+}
+
+.user{
+    color:#d4af37;
+    font-weight:bold;
+}
+
+.datetime{
+    color:#999;
+    font-size:12px;
+}
+
+.row{
+    margin:8px 0;
+    line-height:1.8;
+}
+
+.label{
+    color:#999;
+}
+
+.amount{
+    color:#d4af37;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:8px;
+    font-size:12px;
+}
+
+.pending{
+    background:#4a3210;
+    color:#ffd76a;
+}
+
+.done{
+    background:#143d24;
+    color:#6ee7a1;
+}
+
+
+/* دکمه */
+
+button{
+    width:100%;
+    border:none;
+    border-radius:10px;
+    padding:12px;
+    margin-top:14px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:14px;
+}
+
+.done-btn{
+    background:#d4af37;
+    color:#111;
+    font-weight:bold;
+}
+
+.done-btn:hover{
+    opacity:.9;
+}
+
+.disabled-btn{
+    background:#333;
+    color:#888;
+    cursor:default;
+}
+
+
+/* موبایل */
+
+@media(max-width:600px){
+
+    .container{
+        padding:12px;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .trade-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:5px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="header">
+
+<h1>دفتر روزانه</h1>
+
+<p>پنل حسابدار</p>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+
+<span id="totalCount" class="stat-number">
+0
+</span>
+
+<span class="stat-title">
+کل ثبت‌ها
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<span id="pendingCount" class="stat-number">
+0
+</span>
+
+<span class="stat-title">
+رسیدگی نشده
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<span id="doneCount" class="stat-number">
+0
+</span>
+
+<span class="stat-title">
+رسیدگی شده
+</span>
+
+</div>
+
+</div>
+
+<!-- فیلتر ثبت‌ها -->
+
+<div class="filters">
+
+    <select id="userFilter">
+        <option value="all">همه ثبت‌کننده‌ها</option>
+        <option value="وحید">وحید</option>
+        <option value="امیر">امیر</option>
+    </select>
+
+    <select id="operationFilter">
+        <option value="all">همه عملیات</option>
+        <option value="خرید">خرید</option>
+        <option value="فروش">فروش</option>
+        <option value="پرداخت">پرداخت</option>
+        <option value="دریافت">دریافت</option>
+    </select>
+
+    <select id="statusFilter">
+        <option value="all">همه وضعیت‌ها</option>
+        <option value="ثبت نشده">ثبت نشده</option>
+        <option value="رسیدگی شد">رسیدگی شد</option>
+    </select>
+
+</div>
+
+
+<div id="report">
+
+در حال دریافت اطلاعات...
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+const sheetURL = "https://script.google.com/macros/s/AKfycbzO-qbaGL7exKDRrRZQVTkniY4lC6wH0E38ri5Cp8OWwL3NKwXL0Xlad8_bdSSP3Pj7/exec";
+
+
+
+function loadData(){
+
+
+fetch(sheetURL)
+
+
+.then(response => response.text())
+
+
+.then(text => {
+
+
+console.log(text);
+
+
+const data = JSON.parse(text);
+
+const userFilter =
+    document.getElementById("userFilter").value;
+
+const operationFilter =
+    document.getElementById("operationFilter").value;
+
+const statusFilter =
+    document.getElementById("statusFilter").value;
+
+const report =
+document.getElementById("report");
+
+
+if(!data || data.length <= 1){
+
+report.innerHTML =
+"<div class='trade'>اطلاعاتی ثبت نشده است.</div>";
+
+return;
+
+}
+
+
+let total = 0;
+
+let pending = 0;
+
+let done = 0;
+
+
+report.innerHTML = "";
+
+
+
+for(let i = 1; i < data.length; i++){
+
+
+const item = data[i];
+
+// فیلتر ثبت‌کننده
+if (
+    userFilter !== "all" &&
+    item[3] !== userFilter
+) {
+    continue;
+}
+
+// فیلتر عملیات
+if (
+    operationFilter !== "all" &&
+    item[4] !== operationFilter
+) {
+    continue;
+}
+
+// فیلتر وضعیت
+if (
+    statusFilter !== "all" &&
+    (item[10] || "ثبت نشده") !== statusFilter
+) {
+    continue;
+}
+
+// شماره واقعی ردیف Google Sheet
+const sheetRow = i + 1;
+
+
+total++;
+
+
+const status = item[10] || "ثبت نشده";
+
+
+if(status === "رسیدگی شد"){
+
+done++;
+
+}else{
+
+pending++;
+
+}
+
+
+
+let amount = "";
+
+if(item[6]){
+
+amount =
+Number(item[6]).toLocaleString("fa-IR");
+
+}
+
+
+
+let buttonHTML = "";
+
+
+if(status === "رسیدگی شد"){
+
+buttonHTML = `
+
+<button class="disabled-btn">
+
+✓ رسیدگی شد
+
+</button>
+
+`;
+
+}else{
+
+buttonHTML = `
+
+<button
+class="done-btn"
+onclick="markDone(${sheetRow})">
+
+✓ ثبت به عنوان رسیدگی شد
+
+</button>
+
+`;
+
+}
+
+
+
+report.innerHTML += `
+
+
+<div class="trade">
+
+
+<div class="trade-header">
+
+<div class="user">
+
+👤 ${item[3] || ""}
+
+</div>
+
+
+<div class="datetime">
+
+📅 ${item[1] || ""}
+&nbsp;
+⏰ ${item[2] || ""}
+
+</div>
+
+</div>
+
+
+
+<div class="row">
+
+<span class="label">
+عملیات:
+</span>
+
+<strong>
+${item[4] || ""}
+</strong>
+
+</div>
+
+
+
+<div class="row">
+
+<span class="label">
+شرح:
+</span>
+
+${item[5] || ""}
+
+</div>
+
+
+
+<div class="row">
+
+<span class="label">
+مبلغ:
+</span>
+
+<span class="amount">
+
+${amount || "—"}
+
+</span>
+
+تومان
+
+</div>
+
+
+
+<div class="row">
+
+    <span class="label">
+        وزن:
+    </span>
+
+    ${item[7] || "—"} گرم
+
+</div>
+
+
+<div class="row">
+
+    <span class="label">
+        مظنه:
+    </span>
+
+    ${item[8] || "—"}
+
+</div>
+
+
+
+<div class="row">
+
+<span class="label">
+وضعیت:
+</span>
+
+<span class="status ${
+status === "رسیدگی شد"
+? "done"
+: "pending"
+}">
+
+${status}
+
+</span>
+
+</div>
+
+
+${buttonHTML}
+
+
+</div>
+
+`;
+
+}
+
+
+
+document.getElementById("totalCount").innerText =
+total.toLocaleString("fa-IR");
+
+
+document.getElementById("pendingCount").innerText =
+pending.toLocaleString("fa-IR");
+
+
+document.getElementById("doneCount").innerText =
+done.toLocaleString("fa-IR");
+
+
+})
+
+
+.catch(error => {
+
+
+console.error(error);
+
+
+document.getElementById("report").innerHTML =
+
+"<div class='trade'>خطا در دریافت اطلاعات</div>";
+
+});
+
+
+}
+
+function markDone(row){
+
+    if(!confirm("این ثبت به عنوان رسیدگی شد علامت بخورد؟")){
+        return;
+    }
+
+    const url =
+        sheetURL +
+        "?action=updateStatus&row=" +
+        encodeURIComponent(row);
+
+    fetch(url)
+
+    .then(response => response.text())
+
+    .then(text => {
+
+        console.log("Status response:", text);
+
+        const result = JSON.parse(text);
+
+        if(result.status === "ok"){
+
+            alert("ثبت به عنوان رسیدگی شد.");
+
+            loadData();
+
+        }else{
+
+            alert("خطا در تغییر وضعیت.");
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error("Status error:", error);
+
+        alert("خطا در تغییر وضعیت.");
+
+    });
+
+
+document.getElementById("userFilter").addEventListener("change", loadData);
+
+document.getElementById("operationFilter").addEventListener("change", loadData);
+
+document.getElementById("statusFilter").addEventListener("change", loadData);
+
+loadData();
+
+
+</script>
+
+
+</body>
+
+</html>
